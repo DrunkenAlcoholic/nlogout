@@ -4,7 +4,7 @@ import parsetoml
 
 type
   ButtonConfig = object
-    text, icon, shortcut, color, backgroundColor: string
+    text, icon, shortcut, backgroundColor: string
 
   Config = object
     buttons: Table[string, ButtonConfig]
@@ -12,6 +12,7 @@ type
     programsToTerminate: seq[string]
     fontFamily: string
     fontSize: int
+    fontColor: string
     buttonWidth: int
     buttonHeight: int
     buttonPadding: int
@@ -24,18 +25,19 @@ const
   CONFIG_PATH = getHomeDir() / ".config/nlogout/config.toml"
   DEFAULT_CONFIG = Config(
     buttons: {
-      "cancel": ButtonConfig(text: "Cancel", icon: "\uF00D", shortcut: "Escape", color: "#000000", backgroundColor: "#FFFFFF"),
-      "logout": ButtonConfig(text: "Logout", icon: "\uF2F5", shortcut: "L", color: "#000000", backgroundColor: "#FFFFFF"),
-      "reboot": ButtonConfig(text: "Reboot", icon: "\uF021", shortcut: "R", color: "#000000", backgroundColor: "#FFFFFF"),
-      "shutdown": ButtonConfig(text: "Shutdown", icon: "\uF011", shortcut: "S", color: "#000000", backgroundColor: "#FFFFFF"),
-      "suspend": ButtonConfig(text: "Suspend", icon: "\uF186", shortcut: "U", color: "#000000", backgroundColor: "#FFFFFF"),
-      "hibernate": ButtonConfig(text: "Hibernate", icon: "\uF0E2", shortcut: "H", color: "#000000", backgroundColor: "#FFFFFF"),
-      "lock": ButtonConfig(text: "Lock", icon: "\uF023", shortcut: "K", color: "#000000", backgroundColor: "#FFFFFF")
+      "cancel": ButtonConfig(text: "Cancel", icon: "\uF00D", shortcut: "Escape", backgroundColor: "#FFFFFF"),
+      "logout": ButtonConfig(text: "Logout", icon: "\uF2F5", shortcut: "L", backgroundColor: "#FFFFFF"),
+      "reboot": ButtonConfig(text: "Reboot", icon: "\uF021", shortcut: "R", backgroundColor: "#FFFFFF"),
+      "shutdown": ButtonConfig(text: "Shutdown", icon: "\uF011", shortcut: "S", backgroundColor: "#FFFFFF"),
+      "suspend": ButtonConfig(text: "Suspend", icon: "\uF186", shortcut: "U", backgroundColor: "#FFFFFF"),
+      "hibernate": ButtonConfig(text: "Hibernate", icon: "\uF0E2", shortcut: "H", backgroundColor: "#FFFFFF"),
+      "lock": ButtonConfig(text: "Lock", icon: "\uF023", shortcut: "K", backgroundColor: "#FFFFFF")
     }.toTable,
     window: WindowConfig(width: 800, height: 500, title: "nlogout", backgroundColor: "#FFFFFF"),
     programsToTerminate: @["NimdowStatus"],
     fontFamily: "Arial",
     fontSize: 16,
+    fontColor: "#000000",  # Default font color
     buttonWidth: 120,
     buttonHeight: 200,
     buttonPadding: 5
@@ -84,7 +86,6 @@ proc loadConfig(): Config =
             text: btnConfig.getOrDefault("text").getStr(result.buttons[key].text),
             icon: btnConfig.getOrDefault("icon").getStr(result.buttons[key].icon),
             shortcut: standardizeKeyName(btnConfig.getOrDefault("shortcut").getStr(result.buttons[key].shortcut)),
-            color: btnConfig.getOrDefault("color").getStr(result.buttons[key].color),
             backgroundColor: btnConfig.getOrDefault("background_color").getStr(result.buttons[key].backgroundColor)
           )
     
@@ -95,6 +96,7 @@ proc loadConfig(): Config =
       let fontConfig = toml["font"]
       result.fontFamily = fontConfig.getOrDefault("family").getStr(result.fontFamily)
       result.fontSize = fontConfig.getOrDefault("size").getInt(result.fontSize)
+      result.fontColor = fontConfig.getOrDefault("color").getStr(result.fontColor)
     
     if toml.hasKey("button"):
       let buttonConfig = toml["button"]
@@ -118,7 +120,7 @@ proc createButton(cfg: ButtonConfig, config: Config, action: proc()): Control =
     canvas.fontFamily = config.fontFamily
     canvas.fontSize = config.fontSize.float
     canvas.fontBold = true
-    canvas.textColor = hexToRgb(cfg.color)
+    canvas.textColor = hexToRgb(config.fontColor)
 
     let lines = [cfg.icon, cfg.text, "(" & cfg.shortcut & ")"]
     let lineHeight = config.fontSize.float * 1.0
@@ -160,22 +162,11 @@ proc main() =
   window.title = config.window.title
 
   var container = newLayoutContainer(Layout_Vertical)
- # container.spacing = config.buttonPadding
- # container.padding = config.buttonPadding
- # container.widthMode = WidthMode_Fill
- # container.heightMode = HeightMode_Fill
+  container.spacing = config.buttonPadding
+  container.padding = config.buttonPadding
+  container.widthMode = WidthMode_Fill
+  container.heightMode = HeightMode_Fill
   window.add(container)
-
-  # Set background color
-  var bgColor = hexToRgb(config.window.backgroundColor)
-  var bgControl = newControl()
-  bgControl.widthMode = WidthMode_Fill
-  bgControl.heightMode = HeightMode_Fill
-  bgControl.onDraw = proc (event: DrawEvent) =
-    let canvas = event.control.canvas
-    canvas.areaColor = bgColor
-    canvas.drawRectArea(0, 0, bgControl.width, bgControl.height)
-  container.add(bgControl)
 
   var buttonContainer = newLayoutContainer(Layout_Horizontal)
   buttonContainer.widthMode = WidthMode_Fill
@@ -204,21 +195,13 @@ proc main() =
     if key in config.buttons and key in actions:
       var buttonWrapper = newLayoutContainer(Layout_Vertical)
       buttonWrapper.widthMode = WidthMode_Expand
-      buttonWrapper.heightMode = HeightMode_Expand
-      buttonWrapper.backgroundColor = bgColor
-
-     # var paddingTop = newControl()
-     # paddingTop.heightMode = HeightMode_Expand
-     # buttonWrapper.add(paddingTop)
+      buttonWrapper.heightMode = HeightMode_Fill
+      buttonWrapper.backgroundColor = hexToRgb(config.window.backgroundColor)
 
       var button = createButton(config.buttons[key], config, actions[key])
       button.widthMode = WidthMode_Fill
       button.heightMode = HeightMode_Fill
       buttonWrapper.add(button)
-
-     # var paddingBottom = newControl()
-     # paddingBottom.heightMode = HeightMode_Expand
-     # buttonWrapper.add(paddingBottom)
 
       buttonContainer.add(buttonWrapper)
 

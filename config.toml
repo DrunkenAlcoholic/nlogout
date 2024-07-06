@@ -1,12 +1,13 @@
 [window]
 width = 800
-height = 150
+height = 100
 title = "nlogout"
 background_color = "#ee99a0"
 
 [font]
 family = "DejaVuSans"
 size = 16
+color = "#363a4f"  # Add this line for the font color
 
 [button]
 width = 120
@@ -17,49 +18,42 @@ padding = 5
 text = "Cancel"
 icon = "\uF00D"
 shortcut = "Escape"
-color = "#363a4f"
 background_color = "#eed49f"
 
 [buttons.logout]
 text = "Logout"
 icon = "\uF2F5"
 shortcut = "L"
-color = "#363a4f"
 background_color = "#c6a0f6"
 
 [buttons.reboot]
 text = "Reboot"
 icon = "\uF021"
 shortcut = "R"
-color = "#363a4f"
 background_color = "#f0c6c6"
 
 [buttons.shutdown]
 text = "Shutdown"
 icon = "\uF011"
 shortcut = "S"
-color = "#363a4f"
 background_color = "#f5a97f"
 
 [buttons.suspend]
 text = "Suspend"
 icon = "\uF186"
 shortcut = "U"
-color = "#363a4f"
 background_color = "#7dc4e4"
 
 [buttons.hibernate]
 text = "Hibernate"
 icon = "\uF0E2"
 shortcut = "H"
-color = "#363a4f"
 background_color = "#a6da95"
 
 [buttons.lock]
 text = "Lock"
 icon = "\uF023"
 shortcut = "K"
-color = "#363a4f"
 background_color = "#8aadf4"
 
 programs_to_terminate = ["NimdowStatus"]
