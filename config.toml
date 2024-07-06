@@ -10,27 +10,27 @@ size = 16
 color = "#363a4f"  # Add this line for the font color
 
 [button]
-width = 120
+width = 100
 height = 100
-padding = 5
+padding = 3
 
 [buttons.cancel]
 text = "Cancel"
 icon = "\uF00D"
 shortcut = "Escape"
-background_color = "#eed49f"
+background_color = "#f5e0dc"
 
 [buttons.logout]
 text = "Logout"
 icon = "\uF2F5"
 shortcut = "L"
-background_color = "#c6a0f6"
+background_color = "#cba6f7"
 
 [buttons.reboot]
 text = "Reboot"
 icon = "\uF021"
 shortcut = "R"
-background_color = "#f0c6c6"
+background_color = "#f5c2e7"
 
 [buttons.shutdown]
 text = "Shutdown"
