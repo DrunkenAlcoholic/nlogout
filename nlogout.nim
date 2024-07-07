@@ -33,14 +33,14 @@ const
       "hibernate": ButtonConfig(text: "Hibernate", icon: "\uF0E2", shortcut: "H", backgroundColor: "#a6da95"),
       "lock": ButtonConfig(text: "Lock", icon: "\uF023", shortcut: "K", backgroundColor: "#8aadf4")
     }.toTable,
-    window: WindowConfig(width: 800, height: 100, title: "nlogout", backgroundColor: "#FFFFFF"),
+    window: WindowConfig(width: 600, height: 98, title: "nlogout", backgroundColor: "#FFFFFF"),
     programsToTerminate: @[""],
     fontFamily: "Open Sans",
     fontSize: 16,
     fontColor: "#363a4f",  # Default font color
-    buttonWidth: 100,
-    buttonHeight: 100,
-    buttonPadding: 5
+    buttonWidth: 80,
+    buttonHeight: 80,
+    buttonPadding: 3
   )
   BUTTON_ORDER = ["cancel", "logout", "reboot", "shutdown", "suspend", "hibernate", "lock"]
 
@@ -106,8 +106,8 @@ proc loadConfig(): Config =
 
 proc createButton(cfg: ButtonConfig, config: Config, action: proc()): Control =
   var button = newControl()
-  button.widthMode = WidthMode_Fill
-  button.heightMode = HeightMode_Fill
+  button.width = config.buttonWidth
+  button.height = config.buttonHeight
 
   button.onDraw = proc(event: DrawEvent) =
     let canvas = event.control.canvas
@@ -162,17 +162,27 @@ proc main() =
   window.title = config.window.title
 
   var container = newLayoutContainer(Layout_Vertical)
-  container.spacing = config.buttonPadding
-  container.padding = config.buttonPadding
   container.widthMode = WidthMode_Fill
   container.heightMode = HeightMode_Fill
   window.add(container)
 
+  # Top spacer
+  var spacerTop = newControl()
+  spacerTop.widthMode = WidthMode_Fill
+  spacerTop.heightMode = HeightMode_Expand
+  container.add(spacerTop)
+
+  # Button container
   var buttonContainer = newLayoutContainer(Layout_Horizontal)
   buttonContainer.widthMode = WidthMode_Fill
-  buttonContainer.heightMode = HeightMode_Fill
-  buttonContainer.spacing = config.buttonPadding
+  buttonContainer.height = config.buttonHeight + (2 * config.buttonPadding)
   container.add(buttonContainer)
+
+  # Left spacer in button container
+  var spacerLeft = newControl()
+  spacerLeft.widthMode = WidthMode_Expand
+  spacerLeft.heightMode = HeightMode_Fill
+  buttonContainer.add(spacerLeft)
 
   proc logout() {.closure.} =
     for program in config.programsToTerminate:
@@ -193,26 +203,26 @@ proc main() =
 
   for key in BUTTON_ORDER:
     if key in config.buttons and key in actions:
-      var buttonWrapper = newLayoutContainer(Layout_Vertical)
-      buttonWrapper.widthMode = WidthMode_Expand
-      buttonWrapper.heightMode = HeightMode_Fill
-      buttonWrapper.backgroundColor = hexToRgb(config.window.backgroundColor)
-
       var button = createButton(config.buttons[key], config, actions[key])
-      button.widthMode = WidthMode_Fill
-      button.heightMode = HeightMode_Fill
-      buttonWrapper.add(button)
+      buttonContainer.add(button)
 
-      buttonContainer.add(buttonWrapper)
+  # Right spacer in button container
+  var spacerRight = newControl()
+  spacerRight.widthMode = WidthMode_Expand
+  spacerRight.heightMode = HeightMode_Fill
+  buttonContainer.add(spacerRight)
+
+  # Bottom spacer
+  var spacerBottom = newControl()
+  spacerBottom.widthMode = WidthMode_Fill
+  spacerBottom.heightMode = HeightMode_Expand
+  container.add(spacerBottom)
 
   window.onKeyDown = proc(event: KeyboardEvent) =
     let keyString = standardizeKeyName($event.key)
-    echo "Standardized key pressed: ", keyString  # Debug output
     for key, cfg in config.buttons:
       let standardizedShortcut = standardizeKeyName(cfg.shortcut)
-      echo "Checking against shortcut: ", standardizedShortcut  # Debug output
       if standardizedShortcut == keyString:
-        echo "Matched shortcut: ", key  # Debug output
         if key in actions:
           actions[key]()
           return

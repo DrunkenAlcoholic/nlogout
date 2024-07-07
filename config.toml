@@ -1,22 +1,24 @@
+programs_to_terminate = ["NimdowStatus"]
+
 [window]
-width = 740
-height = 110
-title = "nlogout"
-background_color = "#ee99a0"
+width = 600
+height = 98
+title = "nlogout" #Can be used to set floating mode with your WM
+background_color = "#f5e0dc" #System Themes Override This
 
 [font]
-family = "DejaVuSans"
+family = "Iosevka NFM" #Set you button text font,
 size = 16
-color = "#363a4f"  # Add this line for the font color
+color = "#363a4f"
 
 [button]
-width = 100
-height = 100
-padding = 5
+width = 80
+height = 80
+padding = 3 #spacing around each button
 
 [buttons.cancel]
 text = "Cancel"
-icon = "\uF00D"
+icon = "\uF00D" #set icon, nerd fonts or awesome font
 shortcut = "Escape"
 background_color = "#f5e0dc"
 
@@ -55,5 +57,3 @@ text = "Lock"
 icon = "\uF023"
 shortcut = "K"
 background_color = "#8aadf4"
-
-programs_to_terminate = ["NimdowStatus"]
