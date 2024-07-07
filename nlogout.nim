@@ -25,21 +25,21 @@ const
   CONFIG_PATH = getHomeDir() / ".config/nlogout/config.toml"
   DEFAULT_CONFIG = Config(
     buttons: {
-      "cancel": ButtonConfig(text: "Cancel", icon: "\uF00D", shortcut: "Escape", backgroundColor: "#FFFFFF"),
-      "logout": ButtonConfig(text: "Logout", icon: "\uF2F5", shortcut: "L", backgroundColor: "#FFFFFF"),
-      "reboot": ButtonConfig(text: "Reboot", icon: "\uF021", shortcut: "R", backgroundColor: "#FFFFFF"),
-      "shutdown": ButtonConfig(text: "Shutdown", icon: "\uF011", shortcut: "S", backgroundColor: "#FFFFFF"),
-      "suspend": ButtonConfig(text: "Suspend", icon: "\uF186", shortcut: "U", backgroundColor: "#FFFFFF"),
-      "hibernate": ButtonConfig(text: "Hibernate", icon: "\uF0E2", shortcut: "H", backgroundColor: "#FFFFFF"),
-      "lock": ButtonConfig(text: "Lock", icon: "\uF023", shortcut: "K", backgroundColor: "#FFFFFF")
+      "cancel": ButtonConfig(text: "Cancel", icon: "\uF00D", shortcut: "Escape", backgroundColor: "#f5e0dc"),
+      "logout": ButtonConfig(text: "Logout", icon: "\uF2F5", shortcut: "L", backgroundColor: "#cba6f7"),
+      "reboot": ButtonConfig(text: "Reboot", icon: "\uF021", shortcut: "R", backgroundColor: "#f5c2e7"),
+      "shutdown": ButtonConfig(text: "Shutdown", icon: "\uF011", shortcut: "S", backgroundColor: "#f5a97f"),
+      "suspend": ButtonConfig(text: "Suspend", icon: "\uF186", shortcut: "U", backgroundColor: "#7dc4e4"),
+      "hibernate": ButtonConfig(text: "Hibernate", icon: "\uF0E2", shortcut: "H", backgroundColor: "#a6da95"),
+      "lock": ButtonConfig(text: "Lock", icon: "\uF023", shortcut: "K", backgroundColor: "#8aadf4")
     }.toTable,
-    window: WindowConfig(width: 800, height: 500, title: "nlogout", backgroundColor: "#FFFFFF"),
-    programsToTerminate: @["NimdowStatus"],
-    fontFamily: "Arial",
+    window: WindowConfig(width: 800, height: 100, title: "nlogout", backgroundColor: "#FFFFFF"),
+    programsToTerminate: @[""],
+    fontFamily: "Open Sans",
     fontSize: 16,
-    fontColor: "#000000",  # Default font color
-    buttonWidth: 120,
-    buttonHeight: 200,
+    fontColor: "#363a4f",  # Default font color
+    buttonWidth: 100,
+    buttonHeight: 100,
     buttonPadding: 5
   )
   BUTTON_ORDER = ["cancel", "logout", "reboot", "shutdown", "suspend", "hibernate", "lock"]
