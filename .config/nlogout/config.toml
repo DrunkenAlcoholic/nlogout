@@ -1,0 +1,59 @@
+programs_to_terminate = ["NimdowStatus"] #List any running applications you would like to close before logging out e.g ["NimdowStatus", "st"]
+
+[window]
+width = 600                  #Window Width
+height = 98                  #Window Height
+title = "nlogout"            #Can be used to set "floating" mode with your WM app rules
+background_color = "#f5e0dc" #Window background color, System Themes Override this color
+
+[font]
+family = "Iosevka"  #Set you button text font,
+size = 16           #Size of button font / icon font
+color = "#363a4f"   #Font color
+
+[button]
+width = 80    #Width of button
+height = 80   #Height of button
+padding = 3   #spacing around each button
+
+[buttons.cancel]
+text = "Cancel"              #Rename to anything you like, this will be displayed instead of "Cancel" e.g non english languages
+icon = "\uF00D"              #set icon, nerd fonts or awesome font ect..
+shortcut = "Escape"          #Set the shortcut key binding associated with the button
+background_color = "#f5e0dc" #Button background color
+
+[buttons.logout]
+text = "Logout"
+icon = "\uF2F5"
+shortcut = "L"
+background_color = "#cba6f7"
+
+[buttons.reboot]
+text = "Reboot"
+icon = "\uF021"
+shortcut = "R"
+background_color = "#f5c2e7"
+
+[buttons.shutdown]
+text = "Shutdown"
+icon = "\uF011"
+shortcut = "S"
+background_color = "#f5a97f"
+
+[buttons.suspend]
+text = "Suspend"
+icon = "\uF186"
+shortcut = "U"
+background_color = "#7dc4e4"
+
+[buttons.hibernate]
+text = "Hibernate"
+icon = "\uF0E2"
+shortcut = "H"
+background_color = "#a6da95"
+
+[buttons.lock]
+text = "Lock"
+icon = "\uF023"
+shortcut = "K"
+background_color = "#8aadf4"
