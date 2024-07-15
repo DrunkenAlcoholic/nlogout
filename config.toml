@@ -1,20 +1,20 @@
 # Button order (optional)
 # configured buttons will be shown in the order they appear below
 button_order = ["cancel", "logout", "reboot", "shutdown", "lock", "suspend", "hibernate"]
-#button_order = ["cancel", "logout", "reboot", "shutdown"] Minimal example version
+#button_order = ["logout", "reboot", "shutdown"] #Minimal example version
 
 # Programs to terminate before logout
 programs_to_terminate = ["example_program1", "example_program2"]
 
 # Custom lock screen application (optional)
-lock_screen_app = "i3lock -c 313244" #Greyish Color
+lock_screen_app = "i3lock -c 313244"
 
 # Window configuration
 [window]
 width = 600
 height = 98
 title = "nlogout"
-background_color = "#313244" #Greyish Color
+background_color = "#313244"
 
 # Font configuration
 [font]

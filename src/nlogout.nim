@@ -205,6 +205,7 @@ proc getDesktopEnvironment(): string =
 proc terminate(sApp: string) =
   discard execCmd("pkill " & sApp)
 
+
 proc main() =
   let config = loadConfig()
   app.init()
