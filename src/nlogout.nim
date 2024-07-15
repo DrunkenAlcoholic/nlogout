@@ -4,7 +4,7 @@ import parsetoml
 
 type
   ButtonConfig = object
-    text, shortcut, backgroundColor: string
+    text, shortcut, backgroundColor, textColor: string
 
   WindowConfig = object
     width, height: int
@@ -12,11 +12,12 @@ type
 
   Config = object
     buttons: Table[string, ButtonConfig]
+    buttonOrder: seq[string]
     window: WindowConfig
     programsToTerminate: seq[string]
     fontFamily: string
     fontSize: int
-    fontColor: string
+    fontBold: bool
     buttonWidth: int
     buttonHeight: int
     buttonPadding: int
@@ -28,21 +29,23 @@ type
 const
   CONFIG_PATH = getHomeDir() / ".config/nlogout/config.toml"
   ICON_THEME_PATH = getHomeDir() / ".config/nlogout/themes"
+  DEFAULT_BUTTON_ORDER = @["cancel", "logout", "reboot", "shutdown", "suspend", "hibernate", "lock"]
   DEFAULT_CONFIG = Config(
     buttons: {
-      "cancel": ButtonConfig(text: "Cancel", shortcut: "Escape", backgroundColor: "#f5e0dc"),
-      "logout": ButtonConfig(text: "Logout", shortcut: "L", backgroundColor: "#cba6f7"),
-      "reboot": ButtonConfig(text: "Reboot", shortcut: "R", backgroundColor: "#f5c2e7"),
-      "shutdown": ButtonConfig(text: "Shutdown", shortcut: "S", backgroundColor: "#f5a97f"),
-      "suspend": ButtonConfig(text: "Suspend", shortcut: "U", backgroundColor: "#7dc4e4"),
-      "hibernate": ButtonConfig(text: "Hibernate", shortcut: "H", backgroundColor: "#a6da95"),
-      "lock": ButtonConfig(text: "Lock", shortcut: "K", backgroundColor: "#8aadf4")
+      "cancel": ButtonConfig(text: "Cancel", shortcut: "Escape", backgroundColor: "#f5e0dc", textColor: "#363a4f"),
+      "logout": ButtonConfig(text: "Logout", shortcut: "L", backgroundColor: "#cba6f7", textColor: "#363a4f"),
+      "reboot": ButtonConfig(text: "Reboot", shortcut: "R", backgroundColor: "#f5c2e7", textColor: "#363a4f"),
+      "shutdown": ButtonConfig(text: "Shutdown", shortcut: "S", backgroundColor: "#f5a97f", textColor: "#363a4f"),
+      "suspend": ButtonConfig(text: "Suspend", shortcut: "U", backgroundColor: "#7dc4e4", textColor: "#363a4f"),
+      "hibernate": ButtonConfig(text: "Hibernate", shortcut: "H", backgroundColor: "#a6da95", textColor: "#363a4f"),
+      "lock": ButtonConfig(text: "Lock", shortcut: "K", backgroundColor: "#8aadf4", textColor: "#363a4f")
     }.toTable,
+    buttonOrder: DEFAULT_BUTTON_ORDER,
     window: WindowConfig(width: 740, height: 118, title: "nlogout", backgroundColor: "#FFFFFF"),
     programsToTerminate: @[""],
     fontFamily: "Open Sans",
     fontSize: 16,
-    fontColor: "#363a4f",
+    fontBold: true,
     buttonWidth: 100,
     buttonHeight: 100,
     buttonPadding: 3,
@@ -51,7 +54,6 @@ const
     iconTheme: "default",
     lockScreenApp: "loginctl lock-session"
   )
-  BUTTON_ORDER = ["cancel", "logout", "reboot", "shutdown", "suspend", "hibernate", "lock"]
 
 proc standardizeKeyName(key: string): string =
   result = key.toLower()
@@ -88,7 +90,7 @@ proc loadConfig(): Config =
       let fontConfig = toml["font"]
       result.fontFamily = fontConfig.getOrDefault("family").getStr(result.fontFamily)
       result.fontSize = fontConfig.getOrDefault("size").getInt(result.fontSize)
-      result.fontColor = fontConfig.getOrDefault("color").getStr(result.fontColor)
+      result.fontBold = fontConfig.getOrDefault("bold").getBool(result.fontBold)
     
     if toml.hasKey("button"):
       let buttonConfig = toml["button"]
@@ -99,17 +101,38 @@ proc loadConfig(): Config =
       result.iconSize = buttonConfig.getOrDefault("icon_size").getInt(result.iconSize)
       result.iconTheme = buttonConfig.getOrDefault("icon_theme").getStr(result.iconTheme)
 
+    var configuredButtons: Table[string, ButtonConfig]
     if toml.hasKey("buttons"):
       let buttonConfigs = toml["buttons"]
-      for key in BUTTON_ORDER:
-        if buttonConfigs.hasKey(key):
-          let btnConfig = buttonConfigs[key]
-          result.buttons[key] = ButtonConfig(
-            text: btnConfig.getOrDefault("text").getStr(result.buttons[key].text),
-            shortcut: standardizeKeyName(btnConfig.getOrDefault("shortcut").getStr(result.buttons[key].shortcut)),
-            backgroundColor: btnConfig.getOrDefault("background_color").getStr(result.buttons[key].backgroundColor)
-          )
-    
+      if buttonConfigs.kind == TomlValueKind.Table:
+        for key, value in buttonConfigs.getTable():
+          if value.kind == TomlValueKind.Table:
+            let btnConfig = value.getTable()
+            configuredButtons[key] = ButtonConfig(
+              text: btnConfig.getOrDefault("text").getStr(DEFAULT_CONFIG.buttons.getOrDefault(key).text),
+              shortcut: standardizeKeyName(btnConfig.getOrDefault("shortcut").getStr(DEFAULT_CONFIG.buttons.getOrDefault(key).shortcut)),
+              backgroundColor: btnConfig.getOrDefault("background_color").getStr(DEFAULT_CONFIG.buttons.getOrDefault(key).backgroundColor),
+              textColor: btnConfig.getOrDefault("text_color").getStr(DEFAULT_CONFIG.buttons.getOrDefault(key).textColor)
+            )
+
+    result.buttons = configuredButtons
+
+    if toml.hasKey("button_order"):
+      let orderArray = toml["button_order"]
+      if orderArray.kind == TomlValueKind.Array:
+        result.buttonOrder = @[]
+        for item in orderArray.getElems():
+          if item.kind == TomlValueKind.String:
+            let key = item.getStr()
+            if key in configuredButtons:
+              result.buttonOrder.add(key)
+    elif configuredButtons.len > 0:
+      # If no button_order is specified, use all configured buttons
+      result.buttonOrder = toSeq(configuredButtons.keys)
+    else:
+      # If no buttons are configured, use the default order
+      result.buttonOrder = DEFAULT_BUTTON_ORDER
+
     if toml.hasKey("programs_to_terminate"):
       result.programsToTerminate = toml["programs_to_terminate"].getElems().mapIt(it.getStr())
 
@@ -136,8 +159,8 @@ proc createButton(cfg: ButtonConfig, config: Config, buttonKey: string, action: 
 
     canvas.fontFamily = config.fontFamily
     canvas.fontSize = config.fontSize.float
-    canvas.fontBold = true
-    canvas.textColor = hexToRgb(config.fontColor)
+    canvas.fontBold = config.fontBold
+    canvas.textColor = hexToRgb(cfg.textColor)
 
     var y = config.buttonTopPadding.float
 
@@ -236,7 +259,7 @@ proc main() =
         discard execCmd("loginctl lock-session")
   }.toTable
 
-  for key in BUTTON_ORDER:
+  for key in config.buttonOrder:
     if key in config.buttons and key in actions:
       var button = createButton(config.buttons[key], config, key, actions[key])
       buttonContainer.add(button)
