@@ -50,7 +50,7 @@ nlogout uses a TOML configuration file located at `~/.config/nlogout/config.toml
 - Button appearance and behavior
 - Icon themes
 
-For a detailed explanation of configuration options, see the [Configuration Guide](nloogout.Configuration.Guide.md).
+For a detailed explanation of configuration options, see the [Configuration Guide](nlogout.Configuration.Guide.md).
 
 ## Usage
 
