@@ -7,29 +7,29 @@ button_order = ["cancel", "logout", "reboot", "shutdown", "lock", "suspend", "hi
 programs_to_terminate = ["example_program1", "example_program2"]
 
 # Custom lock screen application (optional)
-lock_screen_app = "i3lock -c 1e1e2e"
+lock_screen_app = "i3lock -c 313244" #Greyish Color
 
 # Window configuration
 [window]
-width = 740
-height = 118
+width = 600
+height = 98
 title = "nlogout"
-background_color = "#FFFFFF"
+background_color = "#313244" #Greyish Color
 
 # Font configuration
 [font]
-family = "Open Sans"
-size = 16
+family = "Noto Sans Mono"
+size = 14
 bold = true
 
 # Global button configuration
 [button]
-width = 100
-height = 100
+width = 80
+height = 80
 padding = 3
-top_padding = 5
+top_padding = 3
 icon_size = 32
-icon_theme = "sardi-purple"
+icon_theme = "default"
 
 # Individual button configurations
 [buttons.cancel]

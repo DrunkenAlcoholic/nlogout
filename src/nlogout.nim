@@ -41,15 +41,15 @@ const
       "lock": ButtonConfig(text: "Lock", shortcut: "K", backgroundColor: "#8aadf4", textColor: "#363a4f")
     }.toTable,
     buttonOrder: DEFAULT_BUTTON_ORDER,
-    window: WindowConfig(width: 740, height: 118, title: "nlogout", backgroundColor: "#FFFFFF"),
+    window: WindowConfig(width: 600, height: 98, title: "nlogout", backgroundColor: "#313244"),
     programsToTerminate: @[""],
-    fontFamily: "Open Sans",
-    fontSize: 16,
+    fontFamily: "Noto Sans Mono",
+    fontSize: 14,
     fontBold: true,
-    buttonWidth: 100,
-    buttonHeight: 100,
+    buttonWidth: 80,
+    buttonHeight: 80,
     buttonPadding: 3,
-    buttonTopPadding: 5,
+    buttonTopPadding: 3,
     iconSize: 32,
     iconTheme: "default",
     lockScreenApp: "loginctl lock-session"
@@ -217,7 +217,12 @@ proc main() =
   var container = newLayoutContainer(Layout_Vertical)
   container.widthMode = WidthMode_Fill
   container.heightMode = HeightMode_Fill
-  container.backgroundColor = hexToRgb(config.window.backgroundColor)
+
+  container.onDraw = proc (event: DrawEvent) =
+    let canvas = event.control.canvas
+    canvas.areaColor = hexToRgb(config.window.backgroundColor)
+    canvas.drawRectArea(0, 0, window.width, window.height)
+
   window.add(container)
 
   # Top spacer
@@ -230,6 +235,12 @@ proc main() =
   var buttonContainer = newLayoutContainer(Layout_Horizontal)
   buttonContainer.widthMode = WidthMode_Fill
   buttonContainer.height = config.buttonHeight + (2 * config.buttonPadding)
+
+  buttonContainer.onDraw = proc (event: DrawEvent) =
+    let canvas = event.control.canvas
+    canvas.areaColor = hexToRgb(config.window.backgroundColor)
+    canvas.drawRectArea(0, 0, buttonContainer.width, buttonContainer.height)
+    
   container.add(buttonContainer)
 
   # Left spacer in button container
