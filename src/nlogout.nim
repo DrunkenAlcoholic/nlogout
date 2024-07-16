@@ -1,66 +1,26 @@
-import std/[os, osproc, strutils, tables, sequtils]
+import std/[os, os, osproc, tables, strutils,  math]
+import nlogout_config
 import nigui
-import parsetoml
 
-type
-  ButtonConfig = object
-    text, shortcut, backgroundColor, textColor: string
 
-  WindowConfig = object
-    width, height: int
-    title, backgroundColor: string
+proc getDesktopEnvironment(): string =
+  let xdgCurrentDesktop = getEnv("XDG_CURRENT_DESKTOP").toLower()
+  if xdgCurrentDesktop != "":
+    return xdgCurrentDesktop
+  
+  let desktopSession = getEnv("DESKTOP_SESSION").toLower()
+  if desktopSession != "":
+    return desktopSession
+  
+  return "unknown"
 
-  Config = object
-    buttons: Table[string, ButtonConfig]
-    buttonOrder: seq[string]
-    window: WindowConfig
-    programsToTerminate: seq[string]
-    fontFamily: string
-    fontSize: int
-    fontBold: bool
-    buttonWidth: int
-    buttonHeight: int
-    buttonPadding: int
-    buttonTopPadding: int
-    iconSize: int
-    iconTheme: string
-    lockScreenApp: string
+proc terminate(sApp: string) =
+  discard execCmd("pkill " & sApp)
 
-const
-  CONFIG_PATH = getHomeDir() / ".config/nlogout/config.toml"
-  ICON_THEME_PATH = getHomeDir() / ".config/nlogout/themes"
-  DEFAULT_BUTTON_ORDER = @["cancel", "logout", "reboot", "shutdown", "suspend", "hibernate", "lock"]
-  DEFAULT_CONFIG = Config(
-    buttons: {
-      "cancel": ButtonConfig(text: "Cancel", shortcut: "Escape", backgroundColor: "#f5e0dc", textColor: "#363a4f"),
-      "logout": ButtonConfig(text: "Logout", shortcut: "L", backgroundColor: "#cba6f7", textColor: "#363a4f"),
-      "reboot": ButtonConfig(text: "Reboot", shortcut: "R", backgroundColor: "#f5c2e7", textColor: "#363a4f"),
-      "shutdown": ButtonConfig(text: "Shutdown", shortcut: "S", backgroundColor: "#f5a97f", textColor: "#363a4f"),
-      "suspend": ButtonConfig(text: "Suspend", shortcut: "U", backgroundColor: "#7dc4e4", textColor: "#363a4f"),
-      "hibernate": ButtonConfig(text: "Hibernate", shortcut: "H", backgroundColor: "#a6da95", textColor: "#363a4f"),
-      "lock": ButtonConfig(text: "Lock", shortcut: "K", backgroundColor: "#8aadf4", textColor: "#363a4f")
-    }.toTable,
-    buttonOrder: DEFAULT_BUTTON_ORDER,
-    window: WindowConfig(width: 600, height: 98, title: "nlogout", backgroundColor: "#313244"),
-    programsToTerminate: @[""],
-    fontFamily: "Noto Sans Mono",
-    fontSize: 14,
-    fontBold: true,
-    buttonWidth: 80,
-    buttonHeight: 80,
-    buttonPadding: 3,
-    buttonTopPadding: 3,
-    iconSize: 32,
-    iconTheme: "default",
-    lockScreenApp: "loginctl lock-session"
-  )
-
-proc standardizeKeyName(key: string): string =
-  result = key.toLower()
-  if result.startsWith("key_"):
-    result = result[4..^1]
-  if result == "esc": result = "escape"
-  elif result == "return": result = "enter"
+proc getIconPath(config: Config, buttonKey: string): string =
+  result = ICON_THEME_PATH / config.iconTheme / (buttonKey & ".svg")
+  if not fileExists(result):
+    result = ICON_THEME_PATH / "default" / (buttonKey & ".svg")
 
 proc hexToRgb(hex: string): Color =
   var hexColor = hex.strip()
@@ -75,74 +35,98 @@ proc hexToRgb(hex: string): Color =
   else:
     result = rgb(0.byte, 0.byte, 0.byte)
 
-proc loadConfig(): Config =
-  result = DEFAULT_CONFIG
-  if fileExists(CONFIG_PATH):
-    let toml = parsetoml.parseFile(CONFIG_PATH)
-    if toml.hasKey("window"):
-      let windowConfig = toml["window"]
-      result.window.width = windowConfig.getOrDefault("width").getInt(result.window.width)
-      result.window.height = windowConfig.getOrDefault("height").getInt(result.window.height)
-      result.window.title = windowConfig.getOrDefault("title").getStr(result.window.title)
-      result.window.backgroundColor = windowConfig.getOrDefault("background_color").getStr(result.window.backgroundColor)
+###############################################################################
+proc drawRoundedRect(canvas: Canvas, x, y, width, height, radius: float, color: Color) =
+  canvas.areaColor = color
+
+  # Draw main rectangle
+  canvas.drawRectArea(x.int, y.int + radius.int, width.int, (height - radius*2).int)
+  canvas.drawRectArea(x.int + radius.int, y.int, (width - radius*2).int, height.int)
+
+  # Draw corners
+  let segments = 90  # Use more segments for smoother corners
+  for i in 0..segments:
+    let angle = i.float / segments.float * PI / 2
+    let px = radius * cos(angle)
+    let py = radius * sin(angle)
+
+    # Top-left corner
+    canvas.drawRectArea(
+      (x + radius - px).int,
+      (y + radius - py).int,
+      1, 1
+    )
+
+    # Top-right corner
+    canvas.drawRectArea(
+      (x + width - radius + px - 1).int,
+      (y + radius - py).int,
+      1, 1
+    )
+
+    # Bottom-left corner
+    canvas.drawRectArea(
+      (x + radius - px).int,
+      (y + height - radius + py - 1).int,
+      1, 1
+    )
+
+    # Bottom-right corner
+    canvas.drawRectArea(
+      (x + width - radius + px - 1).int,
+      (y + height - radius + py - 1).int,
+      1, 1
+    )
+
+  # Fill in the gaps
+  canvas.drawRectArea(x.int, y.int + radius.int, radius.int, 1)
+  canvas.drawRectArea(x.int + width.int - radius.int, y.int + radius.int, radius.int, 1)
+  canvas.drawRectArea(x.int, y.int + height.int - radius.int - 1, radius.int, 1)
+  canvas.drawRectArea(x.int + width.int - radius.int, y.int + height.int - radius.int - 1, radius.int, 1)
+
+
+###############################################################################
+
+#proc drawRoundedRect(canvas: Canvas, x, y, width, height, radius: float, color: Color) =
+#  canvas.areaColor = color
+  
+#  # Draw main rectangle
+#  canvas.drawRectArea(x.int + radius.int, y.int, (width - radius*2).int, height.int)
+#  canvas.drawRectArea(x.int, y.int + radius.int, width.int, (height - radius*2).int)
+  
+#  # Draw corners
+#  let segments = 400 # Increase number of segments for smoother corners
+#  for i in 0..segments:
+#    let angle1 = i.float / segments.float * PI / 2
+#    let angle2 = (i + 1).float / segments.float * PI / 2
     
-    if toml.hasKey("font"):
-      let fontConfig = toml["font"]
-      result.fontFamily = fontConfig.getOrDefault("family").getStr(result.fontFamily)
-      result.fontSize = fontConfig.getOrDefault("size").getInt(result.fontSize)
-      result.fontBold = fontConfig.getOrDefault("bold").getBool(result.fontBold)
+#    # Helper function to draw a segment with slight overlap
+#    proc drawSegment(centerX, centerY: float, flipX, flipY: bool) =
+#      let x1 = centerX + (if flipX: 1 else: -1) * radius * cos(angle1)
+#      let y1 = centerY + (if flipY: 1 else: -1) * radius * sin(angle1)
+#      let x2 = centerX + (if flipX: 1 else: -1) * radius * cos(angle2)
+#      let y2 = centerY + (if flipY: 1 else: -1) * radius * sin(angle2)
+      
+#      let rectX = min(x1, x2).floor.int
+#      let rectY = min(y1, y2).floor.int
+#      let rectWidth = (max(x1, x2) - min(x1, x2)).ceil.int + 2  # +2 for overlap
+#      let rectHeight = (max(y1, y2) - min(y1, y2)).ceil.int + 2  # +2 for overlap
+      
+#      canvas.drawRectArea(rectX, rectY, rectWidth, rectHeight)
     
-    if toml.hasKey("button"):
-      let buttonConfig = toml["button"]
-      result.buttonWidth = buttonConfig.getOrDefault("width").getInt(result.buttonWidth)
-      result.buttonHeight = buttonConfig.getOrDefault("height").getInt(result.buttonHeight)
-      result.buttonPadding = buttonConfig.getOrDefault("padding").getInt(result.buttonPadding)
-      result.buttonTopPadding = buttonConfig.getOrDefault("top_padding").getInt(result.buttonTopPadding)
-      result.iconSize = buttonConfig.getOrDefault("icon_size").getInt(result.iconSize)
-      result.iconTheme = buttonConfig.getOrDefault("icon_theme").getStr(result.iconTheme)
+#    # Top-left corner
+#    drawSegment(x + radius, y + radius, false, false)
+    
+#    # Top-right corner
+#    drawSegment(x + width - radius, y + radius, true, false)
+    
+#    # Bottom-left corner
+#    drawSegment(x + radius, y + height - radius, false, true)
+    
+#    # Bottom-right corner
+#    drawSegment(x + width - radius, y + height - radius, true, true)
 
-    var configuredButtons: Table[string, ButtonConfig]
-    if toml.hasKey("buttons"):
-      let buttonConfigs = toml["buttons"]
-      if buttonConfigs.kind == TomlValueKind.Table:
-        for key, value in buttonConfigs.getTable():
-          if value.kind == TomlValueKind.Table:
-            let btnConfig = value.getTable()
-            configuredButtons[key] = ButtonConfig(
-              text: btnConfig.getOrDefault("text").getStr(DEFAULT_CONFIG.buttons.getOrDefault(key).text),
-              shortcut: standardizeKeyName(btnConfig.getOrDefault("shortcut").getStr(DEFAULT_CONFIG.buttons.getOrDefault(key).shortcut)),
-              backgroundColor: btnConfig.getOrDefault("background_color").getStr(DEFAULT_CONFIG.buttons.getOrDefault(key).backgroundColor),
-              textColor: btnConfig.getOrDefault("text_color").getStr(DEFAULT_CONFIG.buttons.getOrDefault(key).textColor)
-            )
-
-    result.buttons = configuredButtons
-
-    if toml.hasKey("button_order"):
-      let orderArray = toml["button_order"]
-      if orderArray.kind == TomlValueKind.Array:
-        result.buttonOrder = @[]
-        for item in orderArray.getElems():
-          if item.kind == TomlValueKind.String:
-            let key = item.getStr()
-            if key in configuredButtons:
-              result.buttonOrder.add(key)
-    elif configuredButtons.len > 0:
-      # If no button_order is specified, use all configured buttons
-      result.buttonOrder = toSeq(configuredButtons.keys)
-    else:
-      # If no buttons are configured, use the default order
-      result.buttonOrder = DEFAULT_BUTTON_ORDER
-
-    if toml.hasKey("programs_to_terminate"):
-      result.programsToTerminate = toml["programs_to_terminate"].getElems().mapIt(it.getStr())
-
-    if toml.hasKey("lock_screen_app"):
-      result.lockScreenApp = toml["lock_screen_app"].getStr(result.lockScreenApp)
-
-proc getIconPath(config: Config, buttonKey: string): string =
-  result = ICON_THEME_PATH / config.iconTheme / (buttonKey & ".svg")
-  if not fileExists(result):
-    result = ICON_THEME_PATH / "default" / (buttonKey & ".svg")
+##################################################################################
 
 proc createButton(cfg: ButtonConfig, config: Config, buttonKey: string, action: proc()): Control =
   var button = newControl()
@@ -154,8 +138,11 @@ proc createButton(cfg: ButtonConfig, config: Config, buttonKey: string, action: 
     let buttonWidth = button.width.float
     let buttonHeight = button.height.float
 
-    canvas.areaColor = hexToRgb(cfg.backgroundColor)
-    canvas.drawRectArea(0, 0, buttonWidth.int, buttonHeight.int)
+    if config.roundedCorners:
+      drawRoundedRect(canvas, 0, 0, buttonWidth, buttonHeight, config.cornerRadius.float, hexToRgb(cfg.backgroundColor))
+    else:
+      canvas.areaColor = hexToRgb(cfg.backgroundColor)
+      canvas.drawRectArea(0, 0, buttonWidth.int, buttonHeight.int)
 
     canvas.fontFamily = config.fontFamily
     canvas.fontSize = config.fontSize.float
@@ -190,20 +177,6 @@ proc createButton(cfg: ButtonConfig, config: Config, buttonKey: string, action: 
     action()
 
   return button
-
-proc getDesktopEnvironment(): string =
-  let xdgCurrentDesktop = getEnv("XDG_CURRENT_DESKTOP").toLower()
-  if xdgCurrentDesktop != "":
-    return xdgCurrentDesktop
-  
-  let desktopSession = getEnv("DESKTOP_SESSION").toLower()
-  if desktopSession != "":
-    return desktopSession
-  
-  return "unknown"
-
-proc terminate(sApp: string) =
-  discard execCmd("pkill " & sApp)
 
 
 proc main() =
@@ -271,8 +244,13 @@ proc main() =
         discard execCmd("loginctl lock-session")
   }.toTable
 
-  for key in config.buttonOrder:
+  for i, key in config.buttonOrder:
     if key in config.buttons and key in actions:
+      if i > 0:  # Add spacing between buttons, but not before the first button
+        var spacing = newControl()
+        spacing.width = config.buttonPadding
+        buttonContainer.add(spacing)
+      
       var button = createButton(config.buttons[key], config, key, actions[key])
       buttonContainer.add(button)
 
