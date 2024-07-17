@@ -74,7 +74,7 @@ proc createButton(cfg: ButtonConfig, config: Config, buttonKey: string, action: 
     let buttonWidth = button.width.float
     let buttonHeight = button.height.float
 
-    if config.roundedCorners:
+    if config.cornerRadius > 0:
       drawRoundedRect(canvas, 0, 0, buttonWidth, buttonHeight, config.cornerRadius.float, hexToRgb(cfg.backgroundColor))
     else:
       canvas.areaColor = hexToRgb(cfg.backgroundColor)

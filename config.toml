@@ -26,8 +26,7 @@ width = 80
 height = 80
 padding = 3
 top_padding = 3
-rounded_corners = true
-corner_radius = 10
+corner_radius = 10 # Radius of 0 = square button
 icon_size = 32
 icon_theme = "default"
 

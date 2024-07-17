@@ -21,7 +21,6 @@ type
     buttonHeight*: int
     buttonPadding*: int
     buttonTopPadding*: int
-    roundedCorners*: bool
     cornerRadius*: int
     iconSize*: int
     iconTheme*: string
@@ -51,8 +50,7 @@ const
     buttonHeight: 80,
     buttonPadding: 3,
     buttonTopPadding: 3,
-    roundedCorners: false,
-    cornerRadius: 10,
+    cornerRadius: 0,
     iconSize: 32,
     iconTheme: "default",
     lockScreenApp: "loginctl lock-session"
@@ -90,7 +88,6 @@ proc loadConfig*(): Config =
       result.buttonTopPadding = buttonConfig.getOrDefault("top_padding").getInt(result.buttonTopPadding)
       result.iconSize = buttonConfig.getOrDefault("icon_size").getInt(result.iconSize)
       result.iconTheme = buttonConfig.getOrDefault("icon_theme").getStr(result.iconTheme)
-      result.roundedCorners = buttonConfig.getOrDefault("rounded_corners").getBool(result.roundedCorners)
       result.cornerRadius = buttonConfig.getOrDefault("corner_radius").getInt(result.cornerRadius)
 
     var configuredButtons: Table[string, ButtonConfig]
