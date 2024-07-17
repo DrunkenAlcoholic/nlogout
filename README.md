@@ -26,9 +26,9 @@
  cp -r ./themes "$HOME/.config/nlogout/themes"
  ```
 
-### Building from source
+## Building from source
 
-## Prerequisites
+### Prerequisites
 
 - Nim compiler
 - nimble package manager (nimble)
@@ -41,7 +41,7 @@
    nimble install nigui
    nimble install parsetoml
    ```
-## Build 
+### Build 
 
 1. Clone the repository:
    ```
