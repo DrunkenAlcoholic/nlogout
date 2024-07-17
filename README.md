@@ -15,8 +15,20 @@
 - Ability to terminate specified programs before logout
 
 ## Installation
+ - Simply copy nlogout, config.toml and the themes folder to ~/.config/nlogout
+ - Bind a shortcut to nlogout
+ 
+ ```
+ mkdir -p "$HOME/.config/nlogout"
 
-### Prerequisites
+ cp nlogout"$HOME/.config/nlogout/nlogout"
+ cp config.toml "$HOME/.config/nlogout/config.toml"
+ cp -r ./themes "$HOME/.config/nlogout/themes"
+ ```
+
+### Building from source
+
+## Prerequisites
 
 - Nim compiler
 - nimble package manager (nimble)
@@ -29,16 +41,19 @@
    nimble install nigui
    nimble install parsetoml
    ```
-
-### Building from source
+## Build 
 
 1. Clone the repository:
    ```
    git clone https://github.com/DrunkenAlcoholic/nlogout.git
    cd nlogout
    ```
+2. Build the binrary
+   ```
+   nim compile --define:release --opt:size --app:gui --outdir="./bin" src/nlogout.nim 
+   ```
 
-2. Run the rebuild script:
+3. Optionally Run the rebuild script:
    ```
    ./rebuild.sh
    ```

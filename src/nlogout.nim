@@ -1,4 +1,4 @@
-import std/[os, os, osproc, tables, strutils,  math]
+import std/[os, osproc, tables, strutils,  math]
 import nlogout_config
 import nigui
 
