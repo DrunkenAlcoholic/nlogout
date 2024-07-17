@@ -62,9 +62,9 @@
    - Install Nim (if using Arch Linux)
    - Install required Nim modules (parsetoml, nigui)
    - Compile nlogout
+   - The compiled binary will be placed in `~/.config/nlogout/nlogout`
    - Copy the default configuration and themes to `~/.config/nlogout/`
 
-3. The compiled binary will be placed in `~/.config/nlogout/nlogout`
 
 ## Configuration
 
