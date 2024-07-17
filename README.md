@@ -21,7 +21,7 @@
  ```
  mkdir -p "$HOME/.config/nlogout"
 
- cp nlogout"$HOME/.config/nlogout/nlogout"
+ cp ./bin/nlogout "$HOME/.config/nlogout/nlogout"
  cp config.toml "$HOME/.config/nlogout/config.toml"
  cp -r ./themes "$HOME/.config/nlogout/themes"
  ```
