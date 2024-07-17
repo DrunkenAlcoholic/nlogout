@@ -72,7 +72,6 @@ width = 80
 height = 80
 padding = 3
 top_padding = 3
-rounded_corners = false
 corner_radius = 10
 icon_size = 32
 icon_theme = "default"
@@ -82,8 +81,7 @@ icon_theme = "default"
 - `height`: Height of each button (in pixels)
 - `padding`: Padding between buttons (in pixels)
 - `top_padding`: Padding at the top of each button (in pixels)
-- `rounded_corners`: Whether to use rounded corners for buttons (true/false)
-- `corner_radius`: Radius of rounded corners (if enabled)
+- `corner_radius`: Radius of rounded corners, setting 0 means square buttuns
 - `icon_size`: Size of the icons for all buttons (in pixels)
 - `icon_theme`: Name of the icon theme folder (located in `~/.config/nlogout/themes/`)
 
