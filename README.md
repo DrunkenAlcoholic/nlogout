@@ -8,17 +8,27 @@
 
 - Customizable buttons for various system actions (logout, reboot, shutdown, etc.)
 - Configurable appearance (colors, fonts, icon themes)
-- Configurable keyboard shortcuts for quick actions
-- Supports custom lock screen applications
-- Terminates specified programs before logout
+- Support for rounded corners on buttons
+- Keyboard shortcuts for quick actions
+- Custom icon themes
+- Support for custom lock screen applications
+- Ability to terminate specified programs before logout
 
 ## Installation
 
 ### Prerequisites
 
 - Nim compiler
-- nimble package manager
+- nimble package manager (nimble)
+   ```
+   sudo pacman -S nim
+   ```
+
 - nim modules NiGUI and parseToml
+   ```
+   nimble install nigui
+   nimble install parsetoml
+   ```
 
 ### Building from source
 
@@ -49,6 +59,8 @@ nlogout uses a TOML configuration file located at `~/.config/nlogout/config.toml
 - Font settings
 - Button appearance and behavior
 - Icon themes
+- Custom lock screen application
+- Programs to terminate before logout
 
 For a detailed explanation of configuration options, see the [Configuration Guide](nlogout.Configuration.Guide.md).
 

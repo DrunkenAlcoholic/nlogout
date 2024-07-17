@@ -37,96 +37,32 @@ proc hexToRgb(hex: string): Color =
 
 ###############################################################################
 proc drawRoundedRect(canvas: Canvas, x, y, width, height, radius: float, color: Color) =
+  # Set the fill and line color
   canvas.areaColor = color
+  canvas.lineColor = color
 
-  # Draw main rectangle
-  canvas.drawRectArea(x.int, y.int + radius.int, width.int, (height - radius*2).int)
-  canvas.drawRectArea(x.int + radius.int, y.int, (width - radius*2).int, height.int)
+  let radiusInt = radius.int
 
-  # Draw corners
-  let segments = 90  # Use more segments for smoother corners
-  for i in 0..segments:
-    let angle = i.float / segments.float * PI / 2
-    let px = radius * cos(angle)
-    let py = radius * sin(angle)
-
-    # Top-left corner
-    canvas.drawRectArea(
-      (x + radius - px).int,
-      (y + radius - py).int,
-      1, 1
-    )
-
-    # Top-right corner
-    canvas.drawRectArea(
-      (x + width - radius + px - 1).int,
-      (y + radius - py).int,
-      1, 1
-    )
-
-    # Bottom-left corner
-    canvas.drawRectArea(
-      (x + radius - px).int,
-      (y + height - radius + py - 1).int,
-      1, 1
-    )
-
-    # Bottom-right corner
-    canvas.drawRectArea(
-      (x + width - radius + px - 1).int,
-      (y + height - radius + py - 1).int,
-      1, 1
-    )
-
-  # Fill in the gaps
-  canvas.drawRectArea(x.int, y.int + radius.int, radius.int, 1)
-  canvas.drawRectArea(x.int + width.int - radius.int, y.int + radius.int, radius.int, 1)
-  canvas.drawRectArea(x.int, y.int + height.int - radius.int - 1, radius.int, 1)
-  canvas.drawRectArea(x.int + width.int - radius.int, y.int + height.int - radius.int - 1, radius.int, 1)
+  # Draw the main rectangle
+  canvas.drawRectArea(x.int + radiusInt, y.int, (width - radius * 2).int, height.int)
+  canvas.drawRectArea(x.int, y.int + radiusInt, width.int, (height - radius * 2).int)
 
 
-###############################################################################
+  # Draw the rounded corners using arcs
+  canvas.drawArcOutline(x.int + radiusInt, y.int + radiusInt, radius, 180, 90)  # Top-left
+  canvas.drawArcOutline((x + width).int - radiusInt, y.int + radiusInt, radius, 270, 90)  # Top-right
+  canvas.drawArcOutline(x.int + radiusInt, (y + height).int - radiusInt, radius, 90, 90)  # Bottom-left
+  canvas.drawArcOutline((x + width).int - radiusInt, (y + height).int - radiusInt, radius, 0, 90)  # Bottom-right
 
-#proc drawRoundedRect(canvas: Canvas, x, y, width, height, radius: float, color: Color) =
-#  canvas.areaColor = color
-  
-#  # Draw main rectangle
-#  canvas.drawRectArea(x.int + radius.int, y.int, (width - radius*2).int, height.int)
-#  canvas.drawRectArea(x.int, y.int + radius.int, width.int, (height - radius*2).int)
-  
-#  # Draw corners
-#  let segments = 400 # Increase number of segments for smoother corners
-#  for i in 0..segments:
-#    let angle1 = i.float / segments.float * PI / 2
-#    let angle2 = (i + 1).float / segments.float * PI / 2
-    
-#    # Helper function to draw a segment with slight overlap
-#    proc drawSegment(centerX, centerY: float, flipX, flipY: bool) =
-#      let x1 = centerX + (if flipX: 1 else: -1) * radius * cos(angle1)
-#      let y1 = centerY + (if flipY: 1 else: -1) * radius * sin(angle1)
-#      let x2 = centerX + (if flipX: 1 else: -1) * radius * cos(angle2)
-#      let y2 = centerY + (if flipY: 1 else: -1) * radius * sin(angle2)
-      
-#      let rectX = min(x1, x2).floor.int
-#      let rectY = min(y1, y2).floor.int
-#      let rectWidth = (max(x1, x2) - min(x1, x2)).ceil.int + 2  # +2 for overlap
-#      let rectHeight = (max(y1, y2) - min(y1, y2)).ceil.int + 2  # +2 for overlap
-      
-#      canvas.drawRectArea(rectX, rectY, rectWidth, rectHeight)
-    
-#    # Top-left corner
-#    drawSegment(x + radius, y + radius, false, false)
-    
-#    # Top-right corner
-#    drawSegment(x + width - radius, y + radius, true, false)
-    
-#    # Bottom-left corner
-#    drawSegment(x + radius, y + height - radius, false, true)
-    
-#    # Bottom-right corner
-#    drawSegment(x + width - radius, y + height - radius, true, true)
 
-##################################################################################
+  # Fill the corners
+  canvas.drawEllipseArea(x.int, y.int, radiusInt * 2, radiusInt * 2)  # Top-left
+  canvas.drawEllipseArea((x + width).int - radiusInt * 2, y.int, radiusInt * 2, radiusInt * 2)  # Top-right
+  canvas.drawEllipseArea(x.int, (y + height).int - radiusInt * 2, radiusInt * 2, radiusInt * 2)  # Bottom-left
+  canvas.drawEllipseArea((x + width).int - radiusInt * 2, (y + height).int - radiusInt * 2, radiusInt * 2, radiusInt * 2)  # Bottom-right
+
+
+
 
 proc createButton(cfg: ButtonConfig, config: Config, buttonKey: string, action: proc()): Control =
   var button = newControl()
