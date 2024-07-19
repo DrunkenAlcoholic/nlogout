@@ -1,4 +1,4 @@
-import std/[os, sequtils, strutils, tables, math]
+import std/[os, sequtils, strutils, tables]
 import parsetoml
 
 type
@@ -17,6 +17,7 @@ type
     fontFamily*: string
     fontSize*: int
     fontBold*: bool
+    showText*: bool
     buttonWidth*: int
     buttonHeight*: int
     buttonPadding*: int
@@ -46,6 +47,7 @@ const
     fontFamily: "Noto Sans Mono",
     fontSize: 14,
     fontBold: true,
+    showText: true,
     buttonWidth: 80,
     buttonHeight: 80,
     buttonPadding: 3,
@@ -82,6 +84,7 @@ proc loadConfig*(): Config =
     
     if toml.hasKey("button"):
       let buttonConfig = toml["button"]
+      result.showText = buttonConfig.getOrDefault("show_text").getBool(result.showText)
       result.buttonWidth = buttonConfig.getOrDefault("width").getInt(result.buttonWidth)
       result.buttonHeight = buttonConfig.getOrDefault("height").getInt(result.buttonHeight)
       result.buttonPadding = buttonConfig.getOrDefault("padding").getInt(result.buttonPadding)

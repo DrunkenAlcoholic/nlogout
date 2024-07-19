@@ -22,6 +22,7 @@ bold = true
 
 # Global button configuration
 [button]
+show_text = true
 width = 80
 height = 80
 padding = 3

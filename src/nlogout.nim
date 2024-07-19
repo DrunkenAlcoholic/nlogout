@@ -1,4 +1,4 @@
-import std/[os, osproc, tables, strutils,  math]
+import std/[os, osproc, tables, strutils]
 import nlogout_config
 import nigui
 
@@ -98,16 +98,17 @@ proc createButton(cfg: ButtonConfig, config: Config, buttonKey: string, action: 
       y += config.iconSize.float + 5  # Add some padding after the icon
 
     # Draw text
-    let textWidth = canvas.getTextWidth(cfg.text).float
-    let textX = (buttonWidth - textWidth) / 2
-    canvas.drawText(cfg.text, textX.int, y.int)
-    y += config.fontSize.float + 5  # Add some padding after the text
+    if config.showText:
+      let textWidth = canvas.getTextWidth(cfg.text).float
+      let textX = (buttonWidth - textWidth) / 2
+      canvas.drawText(cfg.text, textX.int, y.int)
+      y += config.fontSize.float + 5  # Add some padding after the text
 
-    # Draw shortcut
-    let shortcutText = "(" & cfg.shortcut & ")"
-    let shortcutWidth = canvas.getTextWidth(shortcutText).float
-    let shortcutX = (buttonWidth - shortcutWidth) / 2
-    canvas.drawText(shortcutText, shortcutX.int, y.int)
+      # Draw shortcut
+      let shortcutText = "(" & cfg.shortcut & ")"
+      let shortcutWidth = canvas.getTextWidth(shortcutText).float
+      let shortcutX = (buttonWidth - shortcutWidth) / 2
+      canvas.drawText(shortcutText, shortcutX.int, y.int)
 
   button.onClick = proc(event: ClickEvent) =
     action()

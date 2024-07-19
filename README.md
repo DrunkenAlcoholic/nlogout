@@ -15,7 +15,7 @@
 - Ability to terminate specified programs before logout
 
 ## Installation
- - Simply copy nlogout, config.toml and the themes folder to ~/.config/nlogout
+ - Simply copy nlogout to /usr/bin or any other preferred directory, copy config.toml and the themes folder to ~/.config/nlogout
  - Bind a shortcut to nlogout
  
  ```
@@ -55,15 +55,14 @@
 
 3. Optionally Run the rebuild script:
    ```
-   ./rebuild.sh
+   ./build.sh
    ```
 
    This script will:
    - Install Nim (if using Arch Linux)
    - Install required Nim modules (parsetoml, nigui)
    - Compile nlogout
-   - The compiled binary will be placed in `~/.config/nlogout/nlogout`
-   - Copy the default configuration and themes to `~/.config/nlogout/`
+ Note: You will need to manually copy themes
 
 
 ## Configuration

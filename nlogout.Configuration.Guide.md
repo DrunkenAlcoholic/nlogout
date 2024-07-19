@@ -68,6 +68,7 @@ bold = true
 
 ```toml
 [button]
+show_text = true
 width = 80
 height = 80
 padding = 3
@@ -77,6 +78,7 @@ icon_size = 32
 icon_theme = "default"
 ```
 
+- `show_text`: Whether to show text on buttons (true/false). If set to false, only icons will be displayed.
 - `width`: Width of each button (in pixels)
 - `height`: Height of each button (in pixels)
 - `padding`: Padding between buttons (in pixels)
