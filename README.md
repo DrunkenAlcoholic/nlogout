@@ -17,7 +17,7 @@
 ## Installation
  - Simply copy nlogout to /usr/bin or any other preferred directory, copy config.toml and the themes folder to ~/.config/nlogout
  - Bind a shortcut to nlogout
- 
+
  ```
  mkdir -p "$HOME/.config/nlogout"
 
@@ -41,7 +41,7 @@
    nimble install nigui
    nimble install parsetoml
    ```
-### Build 
+### Build
 
 1. Clone the repository:
    ```
@@ -50,7 +50,7 @@
    ```
 2. Build the binrary
    ```
-   nim compile --define:release --opt:size --app:gui --outdir="./bin" src/nlogout.nim 
+   nim compile --define:release --opt:size --app:gui --outdir="./bin" src/nlogout.nim
    ```
 
 3. Optionally Run the rebuild script:
@@ -62,7 +62,8 @@
    - Install Nim (if using Arch Linux)
    - Install required Nim modules (parsetoml, nigui)
    - Compile nlogout
- Note: You will need to manually copy themes
+
+ Note: You will need to manually copy themes, config.toml to ~/.config/nlogout, Also copy nlogout to /usr/bin or your preffered directory
 
 
 ## Configuration
