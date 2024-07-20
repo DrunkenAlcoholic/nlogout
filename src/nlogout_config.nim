@@ -18,6 +18,7 @@ type
     fontSize*: int
     fontBold*: bool
     showText*: bool
+    showshortcuttext*: bool
     buttonWidth*: int
     buttonHeight*: int
     buttonPadding*: int
@@ -48,6 +49,7 @@ const
     fontSize: 14,
     fontBold: true,
     showText: true,
+    showshortcuttext: true,
     buttonWidth: 80,
     buttonHeight: 80,
     buttonPadding: 3,
@@ -75,16 +77,17 @@ proc loadConfig*(): Config =
       result.window.height = windowConfig.getOrDefault("height").getInt(result.window.height)
       result.window.title = windowConfig.getOrDefault("title").getStr(result.window.title)
       result.window.backgroundColor = windowConfig.getOrDefault("background_color").getStr(result.window.backgroundColor)
-    
+
     if toml.hasKey("font"):
       let fontConfig = toml["font"]
       result.fontFamily = fontConfig.getOrDefault("family").getStr(result.fontFamily)
       result.fontSize = fontConfig.getOrDefault("size").getInt(result.fontSize)
       result.fontBold = fontConfig.getOrDefault("bold").getBool(result.fontBold)
-    
+
     if toml.hasKey("button"):
       let buttonConfig = toml["button"]
       result.showText = buttonConfig.getOrDefault("show_text").getBool(result.showText)
+      result.showshortcuttext = buttonConfig.getOrDefault("keybind_text").getBool(result.showshortcuttext)
       result.buttonWidth = buttonConfig.getOrDefault("width").getInt(result.buttonWidth)
       result.buttonHeight = buttonConfig.getOrDefault("height").getInt(result.buttonHeight)
       result.buttonPadding = buttonConfig.getOrDefault("padding").getInt(result.buttonPadding)

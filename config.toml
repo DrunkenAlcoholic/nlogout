@@ -1,5 +1,13 @@
 # Button order (optional)
-button_order = ["cancel", "logout", "reboot", "shutdown", "lock", "suspend", "hibernate"]
+button_order = [
+    "cancel",
+    "logout",
+    "reboot",
+    "shutdown",
+    "lock",
+    "suspend",
+    "hibernate",
+]
 
 # Programs to terminate before logout
 programs_to_terminate = ["example_program1", "example_program2"]
@@ -22,12 +30,13 @@ bold = true
 
 # Global button configuration
 [button]
-show_text = true
+show_text = true       # Show the main text on the button, setting this false automaticall sets keybind_text to false
+keybind_text = true    # show the shortcut bind text in the button
 width = 80
 height = 80
 padding = 3
 top_padding = 3
-corner_radius = 10 # Radius of 0 = square button
+corner_radius = 10     # Radius of 0 = square button
 icon_size = 32
 icon_theme = "default"
 

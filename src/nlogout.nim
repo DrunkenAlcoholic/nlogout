@@ -7,11 +7,11 @@ proc getDesktopEnvironment(): string =
   let xdgCurrentDesktop = getEnv("XDG_CURRENT_DESKTOP").toLower()
   if xdgCurrentDesktop != "":
     return xdgCurrentDesktop
-  
+
   let desktopSession = getEnv("DESKTOP_SESSION").toLower()
   if desktopSession != "":
     return desktopSession
-  
+
   return "unknown"
 
 proc terminate(sApp: string) =
@@ -105,10 +105,11 @@ proc createButton(cfg: ButtonConfig, config: Config, buttonKey: string, action: 
       y += config.fontSize.float + 5  # Add some padding after the text
 
       # Draw shortcut
-      let shortcutText = "(" & cfg.shortcut & ")"
-      let shortcutWidth = canvas.getTextWidth(shortcutText).float
-      let shortcutX = (buttonWidth - shortcutWidth) / 2
-      canvas.drawText(shortcutText, shortcutX.int, y.int)
+      if config.showshortcuttext:
+        let shortcutText = "(" & cfg.shortcut & ")"
+        let shortcutWidth = canvas.getTextWidth(shortcutText).float
+        let shortcutX = (buttonWidth - shortcutWidth) / 2
+        canvas.drawText(shortcutText, shortcutX.int, y.int)
 
   button.onClick = proc(event: ClickEvent) =
     action()
@@ -151,7 +152,7 @@ proc main() =
     let canvas = event.control.canvas
     canvas.areaColor = hexToRgb(config.window.backgroundColor)
     canvas.drawRectArea(0, 0, buttonContainer.width, buttonContainer.height)
-    
+
   container.add(buttonContainer)
 
   # Left spacer in button container
@@ -174,7 +175,7 @@ proc main() =
     "shutdown": proc() {.closure.} = discard execCmd("systemctl poweroff"),
     "suspend": proc() {.closure.} = discard execCmd("systemctl suspend"),
     "hibernate": proc() {.closure.} = discard execCmd("systemctl hibernate"),
-    "lock": proc() {.closure.} = 
+    "lock": proc() {.closure.} =
       if config.lockScreenApp != "":
         discard execCmd(config.lockScreenApp)
       else:
@@ -187,7 +188,7 @@ proc main() =
         var spacing = newControl()
         spacing.width = config.buttonPadding
         buttonContainer.add(spacing)
-      
+
       var button = createButton(config.buttons[key], config, key, actions[key])
       buttonContainer.add(button)
 

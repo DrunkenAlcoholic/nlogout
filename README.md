@@ -53,7 +53,7 @@
    nim compile --define:release --opt:size --app:gui --outdir="./bin" src/nlogout.nim
    ```
 
-3. Optionally Run the rebuild script:
+3. Optionally Run the build script:
    ```
    ./build.sh
    ```

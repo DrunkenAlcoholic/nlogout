@@ -40,11 +40,9 @@ fi
 # Compile nlogout
 print_color "YELLOW" "Compiling nlogout..."
 if nim compile --define:release --opt:size --app:gui --outdir="./bin" src/nlogout.nim; then
+    sudo cp -v ./bin/nlogout /usr/bin/nlogout
     print_color "GREEN" "nlogout compiled successfully."
 else
     print_color "RED" "Failed to compile nlogout. Please check the error messages above."
     exit 1
 fi
-
-
-print_color "GREEN" "nlogout build completed successfully, Now copy themes directory and config.toml to your .config/nlogout, Then copy nlogout to /usr/bin."
