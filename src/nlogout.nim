@@ -165,7 +165,11 @@ proc main() =
     for program in config.programsToTerminate:
       terminate(program)
     let desktop = getDesktopEnvironment()
-    terminate(desktop)
+    
+    if desktop == "hyprland":
+      discard execCmd("hyprctl dispatch exit")
+    else:
+      terminate(desktop)
     quit(0)
 
   let actions = {
