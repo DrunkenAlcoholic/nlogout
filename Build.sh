@@ -19,13 +19,13 @@ print_color "YELLOW" "Terminating any running nlogout instances..."
 pkill -f "nlogout" || true  # Don't exit if no process found
 
 # Install nim language
-print_color "YELLOW" "Installing nim..."
-if sudo pacman -S nim --noconfirm --needed; then
-    print_color "GREEN" "nim installed successfully."
-else
-    print_color "RED" "Failed to install nim. Please install it manually and rerun this script."
-    exit 1
-fi
+#print_color "YELLOW" "Installing nim..."
+#if sudo pacman -S nim --noconfirm --needed; then
+#    print_color "GREEN" "nim installed successfully."
+#else
+#    print_color "RED" "Failed to install nim. Please install it manually and rerun this script."
+#    exit 1
+#fi
 
 # Install required Nim modules
 print_color "YELLOW" "Installing required Nim modules..."

@@ -29,8 +29,8 @@ type
     lockScreenApp*: string
 
 const
-  CONFIG_PATH* = getHomeDir() / ".config/nlogout/config.toml"
-  ICON_THEME_PATH* = getHomeDir() / ".config/nlogout/themes"
+  CONFIG_PATH* = getHomeDir() & ".config/nlogout/config.toml"
+  ICON_THEME_PATH* = getHomeDir() & ".config/nlogout/themes"
   DEFAULT_BUTTON_ORDER = @["cancel", "logout", "reboot", "shutdown", "suspend", "hibernate", "lock"]
   DEFAULT_CONFIG = Config(
     buttons: {
